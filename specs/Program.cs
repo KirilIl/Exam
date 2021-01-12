@@ -51,31 +51,24 @@ namespace ExamPractice
 
     class Program
     {
-        public static IEnumerable<string> GetSpecialization(int cityId)
+        public static IEnumerable<string> GetSpecialization(string name)
         {
             using (var ctx = new Context())
             {
-                return ctx.Doctors.Where(d => d.CityId == cityId).Select(d => d.Specialization).ToList();
+                return ctx.Doctors
+                    .Join(ctx.Cities.Where(n => n.Name == name),
+                    doct => doct.CityId,
+                    city => city.Id,
+                    (doct, city) => doct)
+                    .Select(x => x.Specialization).ToList();
             }
         }
 
 
         static void Main(string[] args)
         {
-            //var ctx = new Context();
-            //ctx.Cities.Add(new City { Name = "Kiev", Latitude = 1, Longitude = 1 });
-            //ctx.Cities.Add(new City { Name = "Kiev1", Latitude = 1, Longitude = 1 });
 
-            //ctx.Doctors.Add(new Doctor { CityId = 1, Name = "name1", Specialization = "spec1" });
-            //ctx.Doctors.Add(new Doctor { CityId = 1, Name = "name2", Specialization = "spec2" });
-            //ctx.Doctors.Add(new Doctor { CityId = 1, Name = "name3", Specialization = "spec3" });
-            //ctx.Doctors.Add(new Doctor { CityId = 1, Name = "name4", Specialization = "spec4" });
-
-            //ctx.Engineers.Add(new Engineer { CityId = 1, Name = "name4", FavoriteVideogame = "game1" });
-
-            //ctx.SaveChanges();
-
-            foreach (var sp in GetSpecialization(1))
+            foreach (var sp in GetSpecialization("Kiev"))
             {
                 Console.WriteLine(sp);
             }
